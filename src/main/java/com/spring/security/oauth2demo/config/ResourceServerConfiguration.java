@@ -27,18 +27,23 @@ public class ResourceServerConfiguration extends ResourceServerConfigurerAdapter
 
     @Override
     public void configure(HttpSecurity http) throws Exception {
+//        http
+//                .sessionManagement()
+//                .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
+//                .and()
+//                .requestMatchers()
+//                .anyRequest()
+//                .and()
+//                .authorizeRequests()
+//                .antMatchers("/product/**")
+//                .access("#oauth2.hasScope('select') and hasRole('ROLE_USER')")
+//                .antMatchers("/order/**")
+//                .authenticated();//配置order访问控制 ，必须配置权限之后才可访问
+//
         http
-                .sessionManagement()
-                .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
-                .and()
-                .requestMatchers()
-                .anyRequest()
-                .and()
                 .authorizeRequests()
-                .antMatchers("/product/**")
-                .access("#oauth2.hasScope('select') and hasRole('ROLE_USER')")
-                .antMatchers("/order/**")
-                .authenticated();//配置order访问控制 ，必须配置权限之后才可访问
-
+                .antMatchers("/order/**").authenticated();//配置order访问控制，必须认证过后才可以访问
     }
+
+
 }

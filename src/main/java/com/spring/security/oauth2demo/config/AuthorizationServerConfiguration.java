@@ -3,6 +3,7 @@ package com.spring.security.oauth2demo.config;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.oauth2.config.annotation.configurers.ClientDetailsServiceConfigurer;
@@ -36,7 +37,9 @@ public class AuthorizationServerConfiguration extends AuthorizationServerConfigu
     @Override
     public void configure(AuthorizationServerSecurityConfigurer security) throws Exception {
         //允许表单认证
-        security.allowFormAuthenticationForClients();
+        security.allowFormAuthenticationForClients()
+        .checkTokenAccess("permitAll()")
+        .tokenKeyAccess("permitAll()");
 
     }
 
@@ -49,27 +52,29 @@ public class AuthorizationServerConfiguration extends AuthorizationServerConfigu
 //        password 方案二：用 BCrypt 对密码编码
 //        String finalSecret = new BCryptPasswordEncoder().encode("123456");
         // password 方案三：支持多种编码，通过密码的前缀区分编码方式
+
         String finalSecret = "{bcrypt}"+new BCryptPasswordEncoder().encode("123456");
-        clients.inMemory()
-                .withClient("client_1")
+        //配置两个客户端,一个用于password认证一个用于client认证
+        clients.inMemory().withClient("client_1")
                 .resourceIds(DEMO_SOURCE_ID)
                 .authorizedGrantTypes("client_credentials", "refresh_token")
                 .scopes("select")
-                .authorities("client")
+                .authorities("oauth2")
                 .secret(finalSecret)
-                .and()
-                .withClient("client_2")
+                .and().withClient("client_2")
+                .resourceIds(DEMO_SOURCE_ID)
                 .authorizedGrantTypes("password", "refresh_token")
                 .scopes("select")
-                .authorities("client")
+                .authorities("oauth2")
                 .secret(finalSecret);
-
     }
+
 
     @Override
     public void configure(AuthorizationServerEndpointsConfigurer endpoints) throws Exception {
         endpoints
                 .tokenStore(new RedisTokenStore(redisConnectionFactory))
-                .authenticationManager(authenticationManager);
+                .authenticationManager(authenticationManager)
+                .allowedTokenEndpointRequestMethods(HttpMethod.GET,HttpMethod.POST);//允许 GET、POST 请求获取 token，即访问端点：oauth/token
     }
 }

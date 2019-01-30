@@ -23,6 +23,7 @@ import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 @Configuration
 @EnableWebSecurity
 public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
+    @Bean
     @Override
     protected UserDetailsService userDetailsService() {
 
@@ -45,7 +46,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .requestMatchers().anyRequest()
                 .and()
                 .authorizeRequests()
-                .antMatchers("/oauth/*").permitAll();
+                .antMatchers("/oauth/**").permitAll();
     }
 
     @Bean
@@ -68,7 +69,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
     // password 方案三：支持多种编码，通过密码的前缀区分编码方式,推荐
     @Bean
-    PasswordEncoder passwordEncoder(){
+   public PasswordEncoder passwordEncoder(){
         return PasswordEncoderFactories.createDelegatingPasswordEncoder();
     }
 }
