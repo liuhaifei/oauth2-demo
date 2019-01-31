@@ -5,6 +5,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.oauth2.config.annotation.configurers.ClientDetailsServiceConfigurer;
 import org.springframework.security.oauth2.config.annotation.web.configuration.AuthorizationServerConfigurerAdapter;
@@ -33,6 +34,8 @@ public class AuthorizationServerConfiguration extends AuthorizationServerConfigu
     private AuthenticationManager authenticationManager;
     @Autowired
     private RedisConnectionFactory redisConnectionFactory;
+    @Autowired
+    private UserDetailsService userDetailsService;
 
     @Override
     public void configure(AuthorizationServerSecurityConfigurer security) throws Exception {
@@ -75,6 +78,11 @@ public class AuthorizationServerConfiguration extends AuthorizationServerConfigu
         endpoints
                 .tokenStore(new RedisTokenStore(redisConnectionFactory))
                 .authenticationManager(authenticationManager)
-                .allowedTokenEndpointRequestMethods(HttpMethod.GET,HttpMethod.POST);//允许 GET、POST 请求获取 token，即访问端点：oauth/token
+                //注入userDetailService
+                .userDetailsService(userDetailsService)
+                //允许 GET、POST 请求获取 token，即访问端点：oauth/token
+                .allowedTokenEndpointRequestMethods(HttpMethod.GET,HttpMethod.POST);
+
+
     }
 }

@@ -2,6 +2,7 @@ package com.spring.security.oauth2demo.controller;
 
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
@@ -41,6 +42,13 @@ public class TestController {
     public String getOrder(@PathVariable String id) {
         Authentication authentication =
                 SecurityContextHolder.getContext().getAuthentication();
+       Object object= authentication.getPrincipal();
+       if(object instanceof UserDetails){
+           UserDetails ud=(UserDetails)object;
+           System.out.println(ud.getUsername());
+           System.out.println(ud.getPassword());
+           System.out.println(ud.toString());
+       }
         return "order id" + id;
     }
 
